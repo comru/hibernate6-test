@@ -2,6 +2,7 @@ package com.test;
 
 import com.test.model.Customer;
 import com.test.model.PojoClass;
+import com.test.model.JdbcTypeEntity;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
@@ -35,6 +36,9 @@ public class App {
                         .setYesNoBool(true)
                         .setSimpleBool(true);
                 session.persist(customer);
+
+                session.persist(new JdbcTypeEntity());
+
                 session.flush();
             });
 
@@ -51,11 +55,41 @@ public class App {
 
     private static Configuration configureConfiguration() {
         Configuration config = new Configuration();
-        config.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
+
         config.setProperty("hibernate.connection.url", "jdbc:postgresql://localhost/empty_db");
         config.setProperty("hibernate.connection.username", "cuba");
         config.setProperty("hibernate.connection.password", "cuba");
+        config.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
         config.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+
+//        config.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/jpab_test");
+//        config.setProperty("hibernate.connection.username", "root");
+//        config.setProperty("hibernate.connection.password", "root");
+//        config.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
+
+//        config.setProperty("hibernate.connection.url", "jdbc:sqlserver://localhost;databaseName=jpab_test");
+//        config.setProperty("hibernate.connection.username", "sa");
+//        config.setProperty("hibernate.connection.password", "saPass");
+//        config.setProperty("hibernate.connection.driver_class", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+//        config.setProperty("hibernate.connection.url", "jdbc:oracle:thin:@localhost:1521/orcl");
+//        config.setProperty("hibernate.connection.username", "jpab_test");
+//        config.setProperty("hibernate.connection.password", "jpab_test");
+//        config.setProperty("hibernate.connection.driver_class", "oracle.jdbc.driver.OracleDriver");
+
+//        config.setProperty("hibernate.connection.url", "jdbc:db2://localhost:50001/testdb:currentSchema=JPAB_TEST;");
+//        config.setProperty("hibernate.connection.username", "root");
+//        config.setProperty("hibernate.connection.password", "root");
+
+//        config.setProperty("hibernate.connection.url", "jdbc:hsqldb:file:~/petclinic/db;shutdown=true");
+//        config.setProperty("hibernate.connection.username", "sa");
+//        config.setProperty("hibernate.connection.password", "");
+
+//        config.setProperty("hibernate.connection.url", "jdbc:h2:file:./.amplicode/h2/petclinic");
+//        config.setProperty("hibernate.connection.username", "sa");
+//        config.setProperty("hibernate.connection.password", "");
+//        config.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
+
         config.setProperty("hibernate.hbm2ddl.auto", "create");
         config.setProperty("hibernate.format_sql", "true");
         config.setProperty("hibernate.show_sql", "true");
@@ -63,6 +97,7 @@ public class App {
 
         config.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
         config.addAnnotatedClass(Customer.class);
+        config.addAnnotatedClass(JdbcTypeEntity.class);
         return config;
     }
 
