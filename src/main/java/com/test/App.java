@@ -1,8 +1,7 @@
 package com.test;
 
-import com.test.model.Customer;
-import com.test.model.PojoClass;
-import com.test.model.JdbcTypeEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.test.model.*;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
@@ -11,10 +10,7 @@ import org.hibernate.cfg.Configuration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.BitSet;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class App {
@@ -24,8 +20,10 @@ public class App {
         try (SessionFactory sessionFactory = config.buildSessionFactory()) {
             //save
             sessionFactory.inTransaction(session -> {
+                PojoClass pojoExample = new PojoClass("Data", 123, new Date());
+
                 Customer customer = new Customer("Alex")
-                        .setJson(new PojoClass("Data", 123, new Date()))
+                        .setJson(pojoExample)
                         .setXml(Map.of("Kye1", "Value1", "Key2", "Value2"))
                         .setZoneOffset(ZoneOffset.UTC)
                         .setBitSetAttr(BitSet.valueOf(new long[] {1, 0, 0, 1}))
@@ -34,10 +32,22 @@ public class App {
                         .setNumericBoolean(true)
                         .setTrueFalseBool(true)
                         .setYesNoBool(true)
-                        .setSimpleBool(true);
+                        .setSimpleBool(true)
+                        .setXml(Map.of("Key1", "Value1", "Key2", "Value2"));
                 session.persist(customer);
 
                 session.persist(new JdbcTypeEntity());
+
+                Map<String, String> mapJson = new LinkedHashMap<>();
+                mapJson.put("Abc", "1");
+                ObjectMapper mapper = new ObjectMapper();
+                session.persist(new JsonEntity()
+                        .setJsonStr("Hello World")
+                        .setJsonCollection(Arrays.asList("Abc", "1"))
+                        .setJsonMap(mapJson)
+                        .setJsonNode(mapper.valueToTree(pojoExample))
+                        .setJsonPojo(pojoExample)
+                        .setJsonPojoCollection(Set.of(pojoExample)));
 
                 session.flush();
             });
@@ -98,6 +108,7 @@ public class App {
         config.setPhysicalNamingStrategy(new CamelCaseToUnderscoresNamingStrategy());
         config.addAnnotatedClass(Customer.class);
         config.addAnnotatedClass(JdbcTypeEntity.class);
+        config.addAnnotatedClass(JsonEntity.class);
         return config;
     }
 
